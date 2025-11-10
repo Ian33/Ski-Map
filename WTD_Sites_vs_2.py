@@ -143,11 +143,11 @@ def add_map_legend(m, layer_name='WTD Sites', show=True):
     """Add legend to map"""
     legend_html = f'''
     <div id="parameter-legend" style="
-        position: fixed; bottom: 10px; left: 10px; width: 250px;
+        position: fixed; bottom: 10px; right: 10px; width: 250px;
         background-color: white; opacity: 0.9; border: 2px solid grey; border-radius: 5px;
         padding: 10px; font-size: 14px; z-index: 9999;
         box-shadow: 2px 2px 6px rgba(0,0,0,0.3); display: none;">
-        <h4 style="margin: 0 0 10px 0; font-size: 16px;">WTD Sites by Parameter</h4>
+        <h4 style="margin: 0 0 10px 0; font-size: 16px; text-align: center; font-weight: bold;">WTD Sites by Parameter</h4>
         <div style="margin: 5px 0;">
             <span style="display: inline-block; width: 12px; height: 12px; 
                          background-color: #00A5E2; border-radius: 50%; margin-right: 8px;"></span>
@@ -161,7 +161,7 @@ def add_map_legend(m, layer_name='WTD Sites', show=True):
         <hr style="border: none; border-top: 3px solid #74737A; margin: 5px 0;">
         <div style="margin: 5px 0;">
             <span style="display: inline-block; width: 20px; height: 0px; 
-                        border-top: 3px dashed #FFBF65; margin-right: 8px; vertical-align: middle;"></span>
+                        border-top: 3px dashed #AF6D23; margin-right: 8px; vertical-align: middle;"></span>
             WTD Service Area
         </div>
     </div>
@@ -200,35 +200,30 @@ def add_isp_map_legend(m, layer_name='ISP Sites', show=True):
     #  # isp = '#fee08b'  # or blue #8bc9fe non isp = '#D53E4F'
     legend_html = f'''
     <div id="parameter-legend" style="
-        position: fixed; bottom: 10px; left: 10px; width: 250px;
+        position: fixed; bottom: 10px; right: 10px; width: 250px;
         background-color: white; opacity: 0.9; border: 2px solid grey; border-radius: 5px;
         padding: 10px; font-size: 14px; z-index: 9999;
         box-shadow: 2px 2px 6px rgba(0,0,0,0.3); display: none;">
-        <h4 style="margin: 0 0 10px 0; font-size: 16px;">ISP Sites</h4>
+        <h4 style="margin: 0 0 10px 0; font-size: 16px; text-align: center; font-weight: bold;">ISP Sites</h4>
         <div style="margin: 5px 0;">
             <span style="display: inline-block; width: 12px; height: 12px; 
-                         background-color: #e48448; border-radius: 50%; margin-right: 8px;"></span>
-            New ISP Sites
+                         background-color: #f77760; border-radius: 50%; margin-right: 8px;"></span>
+            Sites Supporting ISP, WQBE and WQI
         </div>
         <div style="margin: 5px 0;">
             <span style="display: inline-block; width: 12px; height: 12px; 
-                         background-color: #e44848; border-radius: 50%; margin-right: 8px;"></span>
-            New ISP and WQI Sites
+                         background-color: #F7E360; border-radius: 50%; margin-right: 8px;"></span>
+            Sites Supporting WQI and other programs
         </div>
         <div style="margin: 5px 0;">
             <span style="display: inline-block; width: 12px; height: 12px; 
-                         background-color: #b2b2b5; border-radius: 50%; margin-right: 8px;"></span>
-            WTD Non ISP Sites
-        </div>
-        <div style="margin: 5px 0;">
-            <span style="display: inline-block; width: 12px; height: 12px; 
-                         background-color: #487ee4; border-radius: 50%; margin-right: 8px;"></span>
+                         background-color: #23AFA5; border-radius: 50%; margin-right: 8px;"></span>
             SWM Funded ISP Sites
         </div>
         <hr style="border: none; border-top: 3px solid #74737A; margin: 5px 0;">
         <div style="margin: 5px 0;">
             <span style="display: inline-block; width: 20px; height: 0px; 
-                        border-top: 3px dashed #FFBF65; margin-right: 8px; vertical-align: middle;"></span>
+                        border-top: 3px dashed #AF6D23; margin-right: 8px; vertical-align: middle;"></span>
             WTD Service Area
         </div>
     </div>
@@ -390,7 +385,7 @@ def create_map(sites_gdf, wtd_service_area, wtd_basins):
     
     # Create base map
     m = folium.Map(
-        location=[center_lat, center_lon],
+        location=[center_lat, center_lon+.1],
         zoom_start=10,
         zoom_control=True,
         scrollWheelZoom=True,
@@ -414,7 +409,22 @@ def create_map(sites_gdf, wtd_service_area, wtd_basins):
         control=True,
         show = True,
     ).add_to(m)
-    
+
+    m.get_root().html.add_child(folium.Element("""
+        <style>
+            .leaflet-tile-pane {
+                filter: brightness(0.9);  /* Adjust value: 0.5 = 50% brightness, 1.0 = normal */
+            }
+        </style>
+    """))
+    # CartoDB Dark Matter (dark theme)
+    folium.TileLayer(
+        tiles="Cartodb dark_matter",
+        name='Dark Carto',
+        overlay=False,
+        control=True,
+        show=False,
+    ).add_to(m)
  
     folium.TileLayer(
         tiles='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -432,8 +442,8 @@ def create_map(sites_gdf, wtd_service_area, wtd_basins):
             wtd_service_area,
             style_function=lambda x: {
                 'fillColor': 'transparent',
-                'color': '#FFBF65',
-                'weight': 3,
+                'color': '#AF6D23',
+                'weight': 2,
                 'dashArray': '10, 5',
                 'fillOpacity': 0
             },
@@ -481,13 +491,14 @@ def create_isp_map(sites_gdf, wtd_service_area, wtd_basins):
     # filter out non wtd sites
     #wtd_sites = sites_gdf[sites_gdf["WTD Service Area"] == True]
     # Center map on sites
-    bounds = sites_gdf.total_bounds
+    #bounds = sites_gdf.total_bounds
+    bounds = wtd_service_area.total_bounds
     center_lat = (bounds[1] + bounds[3]) / 2
     center_lon = (bounds[0] + bounds[2]) / 2
     
     # Create base map
     m = folium.Map(
-        location=[center_lat, center_lon],  #center_lat+0.05 moves up/north a bit
+        location=[center_lat, center_lon+ .1],  #center_lat+0.05 moves up/north a bit
         zoom_start=10,
         zoom_control=True,
         scrollWheelZoom=True,
@@ -500,6 +511,22 @@ def create_isp_map(sites_gdf, wtd_service_area, wtd_basins):
         overlay=False,
         control=True,
         show = True,
+    ).add_to(m)
+    # Add CSS to reduce brightness
+    m.get_root().html.add_child(folium.Element("""
+        <style>
+            .leaflet-tile-pane {
+                filter: brightness(0.9);  /* Adjust value: 0.5 = 50% brightness, 1.0 = normal */
+            }
+        </style>
+    """))
+    # CartoDB Dark Matter (dark theme)
+    folium.TileLayer(
+        tiles="Cartodb dark_matter",
+        name='Dark Carto',
+        overlay=False,
+        control=True,
+        show=False,
     ).add_to(m)
     # Add base layers
     folium.TileLayer(
@@ -526,8 +553,8 @@ def create_isp_map(sites_gdf, wtd_service_area, wtd_basins):
             wtd_service_area,
             style_function=lambda x: {
                 'fillColor': 'transparent',
-                'color': '#efcb91',
-                'weight': 3,
+                'color': '#AF6D23',
+                'weight': 2,
                 'dashArray': '10, 5',
                 'fillOpacity': 0
             },
@@ -541,7 +568,7 @@ def create_isp_map(sites_gdf, wtd_service_area, wtd_basins):
         folium.GeoJson(
             wtd_basins,
             style_function=lambda x: {
-                'fillColor': '#20B2AA',
+                'fillColor': '#DEA059',
                 'color': 'black',
                 'weight': 1,
                 'fillOpacity': 0.5
@@ -568,7 +595,6 @@ def create_isp_map(sites_gdf, wtd_service_area, wtd_basins):
     #Sites Supporting WQI and other programs  tellow # D5C12A
     #SWM Funded ISP Site  Blue #23AFA5
 
-    
     isp_wqbe_wqi = sites_gdf.loc[(sites_gdf["program"] == "Sites Supporting ISP, WQBE and WQI")]
     wqi = sites_gdf.loc[(sites_gdf["program"] == "Sites Supporting WQI and other programs")]
     swm = sites_gdf.loc[(sites_gdf["program"] == "SWM Funded ISP Site")]
@@ -576,14 +602,15 @@ def create_isp_map(sites_gdf, wtd_service_area, wtd_basins):
     #Sites Supporting ISP, WQBE and WQI  Orange
     add_filtered_sites(m, isp_wqbe_wqi, parameter_filter=None, program_filter=None, 
                        exclude_empty_notes=False, layer_name="Sites Supporting ISP, WQBE and WQI", 
-                       color='#F58427', show=True, radius=5)
+                       color='#F77760', show=True, radius=5)
+ 
     # Add legend
     add_isp_map_legend(m, layer_name="Sites Supporting ISP, WQBE and WQI", show=True)
 
     #Sites Supporting WQI and other programs
     add_filtered_sites(m, wqi, parameter_filter=None, program_filter=None, 
                        exclude_empty_notes=False, layer_name="Sites Supporting WQI and other programs", 
-                       color='#D5C12A', show=True, radius=5)
+                       color='#F7E360', show=True, radius=5)
     # Add legend
     add_isp_map_legend(m, layer_name="Sites Supporting WQI and other programs", show=True)
     
@@ -591,6 +618,7 @@ def create_isp_map(sites_gdf, wtd_service_area, wtd_basins):
     add_filtered_sites(m, swm, parameter_filter=None, program_filter=None, 
                        exclude_empty_notes=False, layer_name="SWM Funded ISP Site", 
                        color='#23AFA5', show=True, radius=5)
+    print(swm)
     # Add legend
     add_isp_map_legend(m, layer_name="SWM Funded ISP Site", show=True)
             
@@ -672,7 +700,7 @@ def save_map_screenshot(html_path, output_path, pdf_path, window_size=(729, 943)
 if __name__ == "__main__":
     # Import data
     #sites_gdf = site_import(file_path="WTD_map/data/WTD_LTM_Gages.xlsx")
-    sites_gdf = site_import(file_path="data/WTD_LTM_Gages.xlsx")
+    sites_gdf = site_import(file_path="data/WTD_LTM_GageProposalFINAL.xlsx")
     wtd_service_area = wtd_service_area_import()
     basins = basin_import()
     
@@ -683,7 +711,6 @@ if __name__ == "__main__":
     # Create and save map
     m = create_map(sites_gdf, wtd_service_area, basins_filter)
     m.save("data/wtd_map.html")
-    print(sites_gdf.columns)
     # Export processed sites to CSV
     output_cols = [
         "site", "site_name", "parameter", "date installed", "latitude", "longitude",
