@@ -1,0 +1,15 @@
+dash==2.14.1
+dash-auth==2.0.0
+dash-ag-grid
+pandas
+sqlalchemy
+psycopg2-binary
+gunicorn
+sodapy
+python-dotenv
+datetime
+pytz
+plotly
+numpy
+
+

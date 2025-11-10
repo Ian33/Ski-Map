@@ -1,0 +1,3 @@
+# .gitignore
+.env
+WTD_map/data/wtd_map.html
